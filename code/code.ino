@@ -6,15 +6,25 @@
 #include "LedControl.h"
 
 //set alarm time
-int as = 40;
-int am = 25;
-int ah = 11;
+int as = 00;
+int am = 55;
+int ah = 21;
 
 //wheels
 int wheel1 = 8;
 int wheel2 = 9;
 //led
 const int ledPin = 7;
+
+//piezo
+//const int piezo =
+
+//knappar
+const int buttonPin1 = 2;
+const int buttonPin2 = 3;
+const int buttonPin3 = 6;
+
+
 
 // construct objects
 RTC_DS3231 rtc;
@@ -29,25 +39,35 @@ void setup() {
   rtc.begin();
   rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 
-  lc.shutdown(0, false);  // Set the brightness to a medium values
-  lc.setIntensity(0, 8);
+  lc.shutdown(0, false);  
+  lc.setIntensity(0, 0); // Set the brightness to the lowest value
   lc.clearDisplay(0);  // and clear the display
 
+  //wheels
   pinMode(wheel1, OUTPUT);
   pinMode(wheel2, OUTPUT);
-  //pinMode (ledPin, OUTPUT);
+  //led
+  pinMode (ledPin, OUTPUT);
+  //buzzzzzzzzzzzzzzzzzzzzzz
+  //pinMode (piezo, OUTPUT);
+  //knappar
+  pinMode(buttonPin1, INPUT_PULLUP);
+  pinMode (buttonPin2, INPUT_PULLUP);
+  pinMode (buttonPin3, INPUT_PULLUP);
 }
 
 void loop() {
-  //wheels ();
+ Serial.println(getTime());
 
-  Serial.println(getTime());
+  buttons ();
 
-  showTime();
   delay(500);
   showAlarm();
+  delay (1000);
+  showTime();
   delay(500);
   alarm ();
+  
 }
 
 
@@ -60,13 +80,22 @@ void wheels() {  //Funktion för hjulen
   delay(1000);
 }
 
-void showTime() {
+void blink () { //function for led
+  for (int i=0; i<5; i++);{
+    digitalWrite(ledPin, HIGH);
+    delay (500);
+    digitalWrite (ledPin, LOW);
+    delay (500);
+  }
+}
+
+void showTime() {    // button 3??
   DateTime now = rtc.now();  //declaring "now"
   lc.setDigit(0, 0, now.second() % 10, false);
   lc.setDigit(0, 1, (now.second() - (now.second() % 10)) / 10, false);
-  lc.setDigit(0, 2, now.minute() % 10, false);
+  lc.setDigit(0, 2, now.minute() % 10, true);
   lc.setDigit(0, 3, (now.minute() - (now.minute() % 10)) / 10, false);
-  lc.setDigit(0, 4, now.hour() % 10, false);
+  lc.setDigit(0, 4, now.hour() % 10, true);
   lc.setDigit(0, 5, (now.hour() - (now.hour() % 10)) / 10, false);
 }
 
@@ -74,9 +103,9 @@ void showAlarm() {
   DateTime now = rtc.now();  //declaring "now"
   lc.setDigit(0, 0, as % 10, false);
   lc.setDigit(0, 1, (as - (as % 10)) / 10, false);
-  lc.setDigit(0, 2, am % 10, false);
+  lc.setDigit(0, 2, am % 10, true);
   lc.setDigit(0, 3, (am - (am % 10)) / 10, false);
-  lc.setDigit(0, 4, ah % 10, false);
+  lc.setDigit(0, 4, ah % 10, true);
   lc.setDigit(0, 5, (ah - (ah % 10)) / 10, false);
 }
 
@@ -85,7 +114,8 @@ void alarm() {
   if(ah == now.hour() && am==now.minute() && as==now.second()){
     Serial.println("ALARM ON!!!!!!!");
     wheels();
-    digitalWrite(ledPin, HIGH);
+    blink ();
+    //buzzz();
   }
 }
 
@@ -94,3 +124,35 @@ String getTime() {
   DateTime now = rtc.now();
   return String(now.hour()) + ":" + String(now.minute()) + ":" + String(now.second());
 }
+
+
+void buttons () { //button 1???
+  //hours
+  if (digitalRead(buttonPin1) == LOW) { // low or high?
+    //delay (100);
+    ah = ah+1 ;      //lc.setDigit ???
+  }
+
+  if (ah > 23) {  //hour går ej över 23
+    ah = 0;
+    }
+
+    //minutes
+  if (digitalRead(buttonPin2) == LOW) { 
+    //delay (100);
+    am = am+1 ;  
+  }
+  if (am > 59) {  //hour går ej över 23
+    am = 0;
+    ah= ah +1 ;
+    }
+
+  
+}
+
+//void buzzz(){
+  //tone(piezo, 1000); 
+  //delay(1000);         
+  //noTone(piezo);     
+  //delay(1000);         
+//}
