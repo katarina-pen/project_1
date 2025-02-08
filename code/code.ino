@@ -1,3 +1,10 @@
+/*
+* Name: Alarm clock
+* Author: Katarina Penava
+* Date: 2025-02-08
+* Description: 
+*/
+
 
 // Include Libraries
 #include <RTClib.h>  //clock
@@ -13,18 +20,17 @@ int ah = 21;
 //wheels
 int wheel1 = 8;
 int wheel2 = 9;
+
 //led
 const int ledPin = 7;
-
-//piezo
-//const int piezo =
 
 //knappar
 const int buttonPin1 = 2;
 const int buttonPin2 = 3;
 const int buttonPin3 = 6;
 
-
+// boolean variable
+bool AlarmState = false;
 
 // construct objects
 RTC_DS3231 rtc;
@@ -48,8 +54,8 @@ void setup() {
   pinMode(wheel2, OUTPUT);
   //led
   pinMode (ledPin, OUTPUT);
-  //buzzzzzzzzzzzzzzzzzzzzzz
-  //pinMode (piezo, OUTPUT);
+ 
+ 
   //knappar
   pinMode(buttonPin1, INPUT_PULLUP);
   pinMode (buttonPin2, INPUT_PULLUP);
@@ -58,14 +64,21 @@ void setup() {
 
 void loop() {
  Serial.println(getTime());
-
   buttons ();
 
-  delay(500);
-  showAlarm();
-  delay (1000);
-  showTime();
-  delay(500);
+  if (digitalRead(buttonPin3) == LOW) {
+    //delay (500);
+    showAlarm(); 
+    AlarmState = !AlarmState;  
+    while(digitalRead(buttonPin3) == LOW);
+  }
+
+  if (AlarmState) {
+    showAlarm();  // If true, show alarm
+  } else {
+    showTime();   // If false, show time
+  }
+
   alarm ();
   
 }
@@ -115,7 +128,7 @@ void alarm() {
     Serial.println("ALARM ON!!!!!!!");
     wheels();
     blink ();
-    //buzzz();
+    
   }
 }
 
@@ -129,30 +142,26 @@ String getTime() {
 void buttons () { //button 1???
   //hours
   if (digitalRead(buttonPin1) == LOW) { // low or high?
-    //delay (100);
+    delay (500);
     ah = ah+1 ;      //lc.setDigit ???
   }
 
   if (ah > 23) {  //hour går ej över 23
     ah = 0;
     }
+  //while (digitalRead(buttonPin1) == LOW);
 
-    //minutes
+
+
+  //minutes
   if (digitalRead(buttonPin2) == LOW) { 
-    //delay (100);
-    am = am+1 ;  
+    delay (500);
+    am = am+1; 
   }
-  if (am > 59) {  //hour går ej över 23
+
+  if (am > 59) {  //minute går ej över 59
     am = 0;
     ah= ah +1 ;
     }
-
-  
+  //while (digitalRead(buttonPin2) == LOW);
 }
-
-//void buzzz(){
-  //tone(piezo, 1000); 
-  //delay(1000);         
-  //noTone(piezo);     
-  //delay(1000);         
-//}
