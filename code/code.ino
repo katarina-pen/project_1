@@ -14,8 +14,8 @@
 
 //set alarm time
 int as = 00;
-int am = 55;
-int ah = 21;
+int am = 20;
+int ah = 19;
 
 //wheels
 int wheel1 = 8;
@@ -28,9 +28,11 @@ const int ledPin = 7;
 const int buttonPin1 = 2;
 const int buttonPin2 = 3;
 const int buttonPin3 = 6;
+const int buttonPin4 = 4;
 
 // boolean variable
 bool AlarmState = false;
+
 
 // construct objects
 RTC_DS3231 rtc;
@@ -60,6 +62,7 @@ void setup() {
   pinMode(buttonPin1, INPUT_PULLUP);
   pinMode (buttonPin2, INPUT_PULLUP);
   pinMode (buttonPin3, INPUT_PULLUP);
+  pinMode (buttonPin4, INPUT_PULLUP);
 }
 
 void loop() {
@@ -84,17 +87,17 @@ void loop() {
 }
 
 
-void wheels() {  //Funktion för hjulen
-  digitalWrite(wheel1, HIGH);
-  digitalWrite(wheel2, HIGH);
-  delay(1000);
-  digitalWrite(wheel1, LOW);
-  digitalWrite(wheel2, LOW);
-  delay(1000);
-}
+//void wheels() {  //Funktion för hjulen
+ // digitalWrite(wheel1, HIGH);
+ // digitalWrite(wheel2, HIGH);
+ // delay(1000);
+ // digitalWrite(wheel1, LOW);
+ // digitalWrite(wheel2, LOW);
+ // delay(1000);
+//}
 
 void blink () { //function for led
-  for (int i=0; i<5; i++);{
+  for (int i=0; i<5; i++){
     digitalWrite(ledPin, HIGH);
     delay (500);
     digitalWrite (ledPin, LOW);
@@ -123,14 +126,27 @@ void showAlarm() {
 }
 
 void alarm() {
-  DateTime now = rtc.now();  //declaring "now"
-  if(ah == now.hour() && am==now.minute() && as==now.second()){
-    Serial.println("ALARM ON!!!!!!!");
-    wheels();
-    blink ();
-    
+  DateTime now = rtc.now();  // Get the current time
+
+  if (ah == now.hour() && am == now.minute() && as == now.second()) {  
+    AlarmState = true;
+
+    while (AlarmState) {
+      digitalWrite(wheel1, HIGH);
+      digitalWrite(wheel2, HIGH);
+      blink();
+
+      if (digitalRead(buttonPin4) == LOW) {
+        AlarmState = false;
+        digitalWrite(wheel1, LOW);
+        digitalWrite(wheel2, LOW);
+        break;
+      }
+    }
   }
 }
+ 
+
 
 //rtc modul- tid
 String getTime() {
