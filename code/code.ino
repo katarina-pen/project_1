@@ -13,9 +13,9 @@
 #include "LedControl.h"
 
 //set alarm time
-int as = 00;
-int am = 20;
-int ah = 19;
+int as = 10;
+int am = 30;
+int ah = 21;
 
 //wheels
 int wheel1 = 8;
@@ -32,7 +32,7 @@ const int buttonPin4 = 4;
 
 // boolean variable
 bool AlarmState = false;
-
+bool AlarmRing = false;
 
 // construct objects
 RTC_DS3231 rtc;
@@ -128,19 +128,20 @@ void showAlarm() {
 void alarm() {
   DateTime now = rtc.now();  // Get the current time
 
-  if (ah == now.hour() && am == now.minute() && as == now.second()) {  
-    AlarmState = true;
+  if (ah == now.hour() && am == now.minute()) {  
+    AlarmRing = true;
+  
 
-    while (AlarmState) {
+    if (AlarmRing == true) {
       digitalWrite(wheel1, HIGH);
       digitalWrite(wheel2, HIGH);
-      blink();
+      //blink();
 
       if (digitalRead(buttonPin4) == LOW) {
-        AlarmState = false;
+        AlarmRing = !AlarmRing;
         digitalWrite(wheel1, LOW);
         digitalWrite(wheel2, LOW);
-        break;
+        while (digitalRead(buttonPin4)== LOW);
       }
     }
   }
