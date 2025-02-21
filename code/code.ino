@@ -14,8 +14,8 @@
 
 //set alarm time
 int as = 10;
-int am = 30;
-int ah = 21;
+int am = 16;
+int ah = 10;
 
 //wheels
 int wheel1 = 8;
@@ -33,6 +33,7 @@ const int buttonPin4 = 4;
 // boolean variable
 bool AlarmState = false;
 bool AlarmRing = false;
+bool Already = false;
 
 // construct objects
 RTC_DS3231 rtc;
@@ -47,65 +48,65 @@ void setup() {
   rtc.begin();
   rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 
-  lc.shutdown(0, false);  
-  lc.setIntensity(0, 0); // Set the brightness to the lowest value
-  lc.clearDisplay(0);  // and clear the display
+  lc.shutdown(0, false);
+  lc.setIntensity(0, 0);  // Set the brightness to the lowest value
+  lc.clearDisplay(0);     // and clear the display
 
   //wheels
   pinMode(wheel1, OUTPUT);
   pinMode(wheel2, OUTPUT);
   //led
-  pinMode (ledPin, OUTPUT);
- 
- 
+  pinMode(ledPin, OUTPUT);
+
+
   //knappar
   pinMode(buttonPin1, INPUT_PULLUP);
-  pinMode (buttonPin2, INPUT_PULLUP);
-  pinMode (buttonPin3, INPUT_PULLUP);
-  pinMode (buttonPin4, INPUT_PULLUP);
+  pinMode(buttonPin2, INPUT_PULLUP);
+  pinMode(buttonPin3, INPUT_PULLUP);
+  pinMode(buttonPin4, INPUT_PULLUP);
 }
 
 void loop() {
- Serial.println(getTime());
-  buttons ();
+  Serial.println(getTime());
+  buttons();
 
   if (digitalRead(buttonPin3) == LOW) {
     //delay (500);
-    showAlarm(); 
-    AlarmState = !AlarmState;  
-    while(digitalRead(buttonPin3) == LOW);
+    showAlarm();
+    AlarmState = !AlarmState;
+    while (digitalRead(buttonPin3) == LOW)
+      ;
   }
 
   if (AlarmState) {
     showAlarm();  // If true, show alarm
   } else {
-    showTime();   // If false, show time
+    showTime();  // If false, show time
   }
 
-  alarm ();
-  
+  alarm();
 }
 
 
 //void wheels() {  //Funktion för hjulen
- // digitalWrite(wheel1, HIGH);
- // digitalWrite(wheel2, HIGH);
- // delay(1000);
- // digitalWrite(wheel1, LOW);
- // digitalWrite(wheel2, LOW);
- // delay(1000);
+// digitalWrite(wheel1, HIGH);
+// digitalWrite(wheel2, HIGH);
+// delay(1000);
+// digitalWrite(wheel1, LOW);
+// digitalWrite(wheel2, LOW);
+// delay(1000);
 //}
 
-void blink () { //function for led
-  for (int i=0; i<5; i++){
+void blink() {  //function for led
+  for (int i = 0; i < 5; i++) {
     digitalWrite(ledPin, HIGH);
-    delay (500);
-    digitalWrite (ledPin, LOW);
-    delay (500);
+    delay(500);
+    digitalWrite(ledPin, LOW);
+    delay(500);
   }
 }
 
-void showTime() {    // button 3??
+void showTime() {            // button 3??
   DateTime now = rtc.now();  //declaring "now"
   lc.setDigit(0, 0, now.second() % 10, false);
   lc.setDigit(0, 1, (now.second() - (now.second() % 10)) / 10, false);
@@ -128,25 +129,24 @@ void showAlarm() {
 void alarm() {
   DateTime now = rtc.now();  // Get the current time
 
-  if (ah == now.hour() && am == now.minute()) {  
+  if (ah == now.hour() && am == now.minute()) {
     AlarmRing = true;
-  
+  }
 
-    if (AlarmRing == true) {
-      digitalWrite(wheel1, HIGH);
-      digitalWrite(wheel2, HIGH);
-      //blink();
+  if (AlarmRing == true) {
+    digitalWrite(wheel1, HIGH);
+    digitalWrite(wheel2, HIGH);
+    // blink();
+  }
 
-      if (digitalRead(buttonPin4) == LOW) {
-        AlarmRing = !AlarmRing;
-        digitalWrite(wheel1, LOW);
-        digitalWrite(wheel2, LOW);
-        while (digitalRead(buttonPin4)== LOW);
-      }
-    }
+  if (digitalRead(buttonPin4) == LOW) {
+    AlarmRing = false;
+    digitalWrite(wheel1, LOW);
+    digitalWrite(wheel2, LOW);
   }
 }
- 
+
+
 
 
 //rtc modul- tid
@@ -156,29 +156,29 @@ String getTime() {
 }
 
 
-void buttons () { //button 1???
+void buttons() {  //button 1???
   //hours
-  if (digitalRead(buttonPin1) == LOW) { // low or high?
-    delay (500);
-    ah = ah+1 ;      //lc.setDigit ???
+  if (digitalRead(buttonPin1) == LOW) {  // low or high?
+    delay(500);
+    ah = ah + 1;  //lc.setDigit ???
   }
 
   if (ah > 23) {  //hour går ej över 23
     ah = 0;
-    }
+  }
   //while (digitalRead(buttonPin1) == LOW);
 
 
 
   //minutes
-  if (digitalRead(buttonPin2) == LOW) { 
-    delay (500);
-    am = am+1; 
+  if (digitalRead(buttonPin2) == LOW) {
+    delay(500);
+    am = am + 1;
   }
 
   if (am > 59) {  //minute går ej över 59
     am = 0;
-    ah= ah +1 ;
-    }
+    ah = ah + 1;
+  }
   //while (digitalRead(buttonPin2) == LOW);
 }
